@@ -1,0 +1,31 @@
+import 'package:field_star_technician_app/navbar/navbar.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main()async {
+   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://pspegmbnkmaiwaryafby.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGVnbWJua21haXdhcnlhZmJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTA3NTYsImV4cCI6MjA5NjQ2Njc1Nn0.A6DbjdHbPd2lnlEYLjPGEGtG8IubIynQCAVkf31t534',
+  );
+  runApp(const MyApp());
+}
+
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+ 
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: appRouter,
+     debugShowCheckedModeBanner: false,
+     
+    );
+  }
+}
+
+
+
