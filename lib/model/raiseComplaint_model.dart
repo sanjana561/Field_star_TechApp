@@ -12,7 +12,8 @@ class RaiseComplaintModel {
   final String status;
   final String techStatus;
   final AssignedjobModel? technician;
-
+  final String? customerId; 
+  final String technicianName;
   RaiseComplaintModel({
     this.dbId,                // ← optional
     required this.id,
@@ -24,7 +25,8 @@ class RaiseComplaintModel {
     required this.priority,
     required this.status,
     required this.techStatus,
-    this.technician,
+    this.technician, required this.technicianName, this.customerId,
+    
   });
 
   factory RaiseComplaintModel.fromMap(Map<String, dynamic> map) {
@@ -41,6 +43,8 @@ class RaiseComplaintModel {
       priority: map['priority_level'] ?? 'Low',
       status: map['complaint_status'] ?? 'Pending',
       techStatus: map['tech_status'] ?? 'Pending',
+      technicianName: map['technician_name'] ?? '',
+       customerId: map['customer_id']?.toString(),
       technician: techMap != null
           ? AssignedjobModel.fromMap(techMap)
           : null,

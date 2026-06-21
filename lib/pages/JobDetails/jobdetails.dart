@@ -1,3 +1,4 @@
+import 'package:field_star_technician_app/model/assignedjob_model.dart';
 import 'package:field_star_technician_app/model/customer_model.dart';
 import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/pages/Assign_Jobs/inspection_page.dart';
@@ -7,13 +8,16 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Jobdetails extends StatefulWidget {
   final RaiseComplaintModel complaint;
-  const Jobdetails({super.key, required this.complaint});
+  
+  final String customerid;
+  const Jobdetails({super.key, required this.complaint, required this.customerid});
 
   @override
   State<Jobdetails> createState() => _JobdetailsState();
 }
 
 class _JobdetailsState extends State<Jobdetails> {
+   AssignedjobModel? _techDetails;
   final database = DatabaseOpration();
   @override
   Widget build(BuildContext context) {
@@ -32,45 +36,46 @@ class _JobdetailsState extends State<Jobdetails> {
             }
           },
         ),
-        title:  Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FutureBuilder<RaiseComplaintModel?>
-            (future: database.fetchComplaintByTicketId(widget.complaint.id),
-             builder: (context,snapshot){
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+            FutureBuilder<RaiseComplaintModel?>(
+              future: database.fetchComplaintByTicketId(widget.complaint.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
 
-                    if (!snapshot.hasData || snapshot.data == null) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Text('No complaints found'),
-                        ),
-                      );
-                    }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('No complaints found'),
+                    ),
+                  );
+                }
 
-                    final complaint = snapshot.data!;
-                    return    Text(
-              '${complaint.id}',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w900,
-                fontSize: 20,
-              ),
-            );
-             }),
-         
+                final complaint = snapshot.data!;
+                return Text(
+                  '${complaint.id}',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                  ),
+                );
+              },
+            ),
+
             Text(
               'Service Request Details',
               style: TextStyle(fontSize: 14, color: Colors.black54),
@@ -84,73 +89,75 @@ class _JobdetailsState extends State<Jobdetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Customer Info
-          FutureBuilder<List<CustomerModel>>(
-  future: database.fetchcustomer(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
+            FutureBuilder<List<CustomerModel>>(
+              future: database.fetchcustomer(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-    if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
-    }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-    final customers = snapshot.data ?? [];
+                final customers = snapshot.data ?? [];
 
-    if (customers.isEmpty) {
-      return const Center(child: Text('No customers found.'));
-    }
+                if (customers.isEmpty) {
+                  return const Center(child: Text('No customers found.'));
+                }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: customers.length,
-      itemBuilder: (context, index) {
-        final customer = customers[index];
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: customers.length,
+                  itemBuilder: (context, index) {
+                    final customer = customers[index];
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              customer.hotelName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          customer.hotelName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        Text(
+                          "Contact: ${customer.customerName}\nPhone: ${customer.phone}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+
+                        Text(
+                          "Location: ${customer.location}, ${customer.place}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+
+                        Text(
+                          "Total Equipment: ${customer.totalEquipment}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+
+                        Text(
+                          "Complaints: ${customer.complaintCount}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
-
-            Text(
-              "Contact: ${customer.customerName}\nPhone: ${customer.phone}",
-              style: const TextStyle(color: Colors.grey),
-            ),
-
-            Text(
-              "Location: ${customer.location}, ${customer.place}",
-              style: const TextStyle(color: Colors.grey),
-            ),
-
-            Text(
-              "Total Equipment: ${customer.totalEquipment}",
-              style: const TextStyle(color: Colors.grey),
-            ),
-
-            Text(
-              "Complaints: ${customer.complaintCount}",
-              style: const TextStyle(color: Colors.grey),
-            ),
-          ],
-        );
-      },
-    );
-  },
-),
 
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                        _makeCall(_techDetails?.phoneNo ?? '-');
+                    },
                     icon: const Icon(Icons.call),
                     label: const Text("Call Customer"),
                   ),
@@ -158,7 +165,9 @@ class _JobdetailsState extends State<Jobdetails> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                       _sendSms(_techDetails?.phoneNo ?? '-');
+                    },
                     icon: const Icon(Icons.message),
                     label: const Text("SMS"),
                   ),
@@ -178,9 +187,29 @@ class _JobdetailsState extends State<Jobdetails> {
                 ),
               ],
             ),
-            const Text(
-              "Main Kitchen, 5th Floor\nOff Western Express Highway, Santacruz East",
-              style: TextStyle(color: Colors.grey),
+            FutureBuilder<List<CustomerModel>>(
+              future: database.fetchcustomer(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
+                final customers = snapshot.data ?? [];
+
+                if (customers.isEmpty) {
+                  return const Center(child: Text('No customers found.'));
+                }
+
+                final customer = customers.first;
+                return Text(
+                  "Location: ${customer.location}, ${customer.place}",
+                  style: const TextStyle(color: Colors.grey),
+                );
+              },
             ),
             const SizedBox(height: 10),
             SizedBox(
@@ -201,66 +230,64 @@ class _JobdetailsState extends State<Jobdetails> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-            FutureBuilder<RaiseComplaintModel?>
-            (future: database.Fetchcomplaintdetais(widget.complaint.id),
-            builder: (context, snapshot) {
+            FutureBuilder<RaiseComplaintModel?>(
+              future: database.Fetchcomplaintdetais(widget.complaint.id),
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
 
-                    if (!snapshot.hasData || snapshot.data == null) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Text('No complaints details found'),
-                        ),
-                      );
-                    }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('No complaints details found'),
+                    ),
+                  );
+                }
 
-                    final complaint = snapshot.data!;
-                    return    Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child:  Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                final complaint = snapshot.data!;
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.description, color: Colors.orange),
-                      SizedBox(width: 10),
+                      Row(
+                        children: [
+                          Icon(Icons.description, color: Colors.orange),
+                          SizedBox(width: 10),
+                          Text(
+                            '${complaint.type}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Text("Service Required: ${complaint.title}"),
+                      Divider(),
                       Text(
-                      '${complaint.type}',
+                        "Reported Issue:",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      Text('${complaint.issue}'),
                     ],
                   ),
-                  Text("Service Required: ${complaint.title}"),
-                  Divider(),
-                  Text(
-                    "Reported Issue:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '${complaint.issue}'
-                   ,
-                  ),
-                ],
-              ),
-            );
-            },),
-         
+                );
+              },
+            ),
+
             const Divider(height: 30),
 
             // Service History
@@ -269,17 +296,39 @@ class _JobdetailsState extends State<Jobdetails> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-            _buildHistoryItem(
-              "Routine Maintenance",
-              "Oil filter replacement, sensor calibration",
-              "Mar 15, 2026",
-              "Amit Patel (TECH-182)",
-            ),
-            _buildHistoryItem(
-              "Emergency Repair",
-              "Heating element replacement",
-              "Jan 08, 2026",
-              "Suresh Menon (TECH-156)",
+         FutureBuilder<RaiseComplaintModel?>(
+              future: database.Fetchcomplaintdetais(widget.complaint.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('No complaints details found'),
+                    ),
+                  );
+                }
+
+                final complaint = snapshot.data!;
+                return _buildHistoryItem(
+                  complaint.type,
+                  complaint.issue,
+                  complaint.date,
+                  complaint.technicianName,
+                );
+              },
             ),
 
             SizedBox(height: 15),
@@ -322,18 +371,13 @@ class _JobdetailsState extends State<Jobdetails> {
                 ],
               ),
             ),
-        
 
-          
             const Divider(height: 30),
             Row(
               children: [
-                
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                    
-                    },
+                    onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
                         color: Colors.grey,
@@ -352,8 +396,8 @@ class _JobdetailsState extends State<Jobdetails> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12), 
-              
+                const SizedBox(width: 12),
+
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
@@ -361,14 +405,14 @@ class _JobdetailsState extends State<Jobdetails> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => InspectionPage(
-                        complaintId: widget.complaint.dbId!,
+                            complaint: widget.complaint,
                           ),
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, 
-                      foregroundColor: Colors.white, 
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -419,6 +463,31 @@ class _JobdetailsState extends State<Jobdetails> {
 
     if (!launched) {
       throw Exception('Could not launch Google Maps');
+    }
+  }
+
+  
+  //==============================Make a call======================================
+  Future<void> _makeCall(String phone) async {
+    final Uri uri = Uri(scheme: 'tel', path: phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open dialer')));
+    }
+  }
+
+  //=======================Send message=================================
+  Future<void> _sendSms(String phone) async {
+    final Uri uri = Uri(scheme: 'sms', path: phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open SMS app')));
     }
   }
 }

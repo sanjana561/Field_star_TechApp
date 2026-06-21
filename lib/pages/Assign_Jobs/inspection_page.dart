@@ -9,8 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class InspectionPage extends StatefulWidget {
-  final int complaintId;
-  const InspectionPage({super.key, required this.complaintId});
+      final RaiseComplaintModel complaint;
+  const InspectionPage({super.key, required this.complaint});
 
   @override
   State<InspectionPage> createState() => _InspectionPageState();
@@ -430,7 +430,7 @@ class _InspectionPageState extends State<InspectionPage> {
               height: 34,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDBA74),
+                  backgroundColor: const Color.fromARGB(255, 251, 135, 12),
                   foregroundColor: Colors.white,
 
                   elevation: 0,
@@ -442,7 +442,7 @@ class _InspectionPageState extends State<InspectionPage> {
                     ? () async {
                         try {
                           await DatabaseOpration().submitInspection(
-                            complaintId: widget.complaintId,
+                            complaintId: widget.complaint.dbId!,
                             checklistLabels: checklist,
                             checks: _checks,
                             diagnosis: _diagCtrl.text.trim(),
@@ -453,7 +453,7 @@ class _InspectionPageState extends State<InspectionPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => SpareParts(
-                                 complaintId: widget.complaintId, 
+                                 complaint: widget.complaint, 
                               ),
                             ),
                           );

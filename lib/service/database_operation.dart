@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:field_star_technician_app/model/assignedjob_model.dart';
 import 'package:field_star_technician_app/model/customer_model.dart';
 import 'package:field_star_technician_app/model/inspectionmodel.dart';
@@ -111,7 +110,7 @@ class DatabaseOpration {
   final technicianId = techResponse['id'];
   final response = await supabase
       .from('Raise_complaint')
-      .select('tech_status')
+      .select('complaint_status,tech_status')
       .eq('technician_id', technicianId);
 
   final complaints = response as List;
@@ -120,11 +119,11 @@ class DatabaseOpration {
   final today = DateTime.now();
   int jobsToday = complaints.length;
   int completed = complaints
-      .where((c) => c['tech_status'] == 'Completed').length;
+      .where((c) => c['complaint_status'] == 'Completed').length;
   int inProgress = complaints
-      .where((c) => c['tech_status'] == 'In Progress').length;
+      .where((c) => c['tech_status'] == 'Assigned').length;
   int pending = complaints
-      .where((c) => c['tech_status'] == 'Pending').length;
+      .where((c) => c['complaint_status'] == 'pending').length;
 
   return {
     'jobsToday': jobsToday,
@@ -239,5 +238,20 @@ Future<void> addSparePart(SparePartModel part) async {
    Future<void> deleteSparePart(int id) async {
     await supabase.from('spare_parts').delete().eq('id', id);
   }
+
+  //=========================Fetch complete history detils=========================
+  Future<List<RaiseComplaintModel>> fetchCompletedHistory(String tickectId) async {
+  final response = await supabase
+      .from('Raise_complaint')
+      .select()
+      .eq('tickectid', tickectId)
+      .eq('complaint_status', 'completed')
+      .order('created_at', ascending: false);
+
+  return (response as List)
+      .map((e) => RaiseComplaintModel.fromMap(e))
+      .toList();
+}
+
 }
 

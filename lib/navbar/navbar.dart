@@ -80,11 +80,15 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
-   GoRoute(
+ GoRoute(
   path: '/jobdetails',
-  builder: (context, state) => Jobdetails(
-    complaint: state.extra as RaiseComplaintModel,  // ← receive via extra
-  ),
+  builder: (context, state) {
+    final complaint = state.extra as RaiseComplaintModel;
+    return Jobdetails(
+      complaint: complaint,
+      customerid: complaint.id ,  // ← clean
+    );
+  },
 ),
     GoRoute(
       path: '/login',

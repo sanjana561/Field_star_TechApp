@@ -1,9 +1,12 @@
+import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/pages/payments/signature_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CompleteServicePage extends StatefulWidget {
-  const CompleteServicePage({super.key});
+  final RaiseComplaintModel complaint;
+  const CompleteServicePage({super.key, required this.complaint});
 
   @override
   State<CompleteServicePage> createState() => _CompleteServicePageState();
@@ -13,6 +16,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
     with SingleTickerProviderStateMixin {
   static const int _otpLength = 4;
 
+  bool _isVerifying = false;
   late final List<TextEditingController> _controllers;
   late final List<FocusNode> _focusNodes;
   late final AnimationController _shakeController;
@@ -71,31 +75,48 @@ class _CompleteServicePageState extends State<CompleteServicePage>
     }
   }
 
-  void _verifyOtp() {
-    if (!_isComplete) return;
-
-    // Demo: "0000" triggers error — replace with real validation
-    if (_otpValue == '0000') {
-      setState(() => _hasError = true);
-      _shakeController.forward(from: 0);
-      for (final c in _controllers) c.clear();
-      _focusNodes[0].requestFocus();
-      setState(() {});
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignaturePage()),
-    );
-  }
-
   @override
   void dispose() {
     for (final c in _controllers) c.dispose();
     for (final f in _focusNodes) f.dispose();
     _shakeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _verifyOtp() async {
+    if (!_isComplete) return;
+
+    setState(() => _isVerifying = true);
+
+    try {
+      final response = await Supabase.instance.client
+          .from('Raise_complaint')
+          .select('otp')
+          .eq('id', widget.complaint.dbId!)
+          .single();
+
+      final savedOtp = response['otp']?.toString() ?? '';
+
+      if (_otpValue == savedOtp) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SignaturePage(complaint: widget.complaint),
+          ),
+        );
+      } else {
+        setState(() => _hasError = true);
+        _shakeController.forward(from: 0);
+        for (final c in _controllers) c.clear();
+        _focusNodes[0].requestFocus();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      setState(() => _isVerifying = false);
+    }
   }
 
   @override
@@ -111,13 +132,10 @@ class _CompleteServicePageState extends State<CompleteServicePage>
             Text(
               'Complete Service',
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'TCK-2451 • Final verification required',
-              style: TextStyle(color: Colors.blueGrey, fontSize: 11),
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -156,15 +174,20 @@ class _CompleteServicePageState extends State<CompleteServicePage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Customer OTP Required',
-                          style: TextStyle(
-                              color: Colors.deepOrange,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'Customer OTP Required',
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 8),
                       Text(
                         'Request customer to provide the 4-digit OTP sent to their registered mobile number',
-                        style:
-                            TextStyle(color: Colors.deepOrange, fontSize: 12),
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -224,8 +247,11 @@ class _CompleteServicePageState extends State<CompleteServicePage>
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline_rounded,
-                    color: Color(0xFFDC2626), size: 16),
+                Icon(
+                  Icons.error_outline_rounded,
+                  color: Color(0xFFDC2626),
+                  size: 16,
+                ),
                 SizedBox(width: 6),
                 Text(
                   'Invalid OTP. Please try again.',
@@ -241,11 +267,11 @@ class _CompleteServicePageState extends State<CompleteServicePage>
 
           const SizedBox(height: 22),
 
-          // ── Verify button ───────────────────────────────────────────────
+ // ── Verify button ───────────────────────────────────────────────
           SizedBox(
             height: 44,
             child: ElevatedButton(
-              onPressed: _isComplete ? _verifyOtp : null,
+              onPressed: _isComplete && !_isVerifying ? _verifyOtp : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepOrange,
                 foregroundColor: Colors.white,
@@ -253,12 +279,22 @@ class _CompleteServicePageState extends State<CompleteServicePage>
                 disabledForegroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7)),
+                  borderRadius: BorderRadius.circular(7),
+                ),
               ),
-              child: const Text(
-                'Verify OTP',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              child: _isVerifying
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'Verify OTP',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
             ),
           ),
         ],
@@ -272,8 +308,11 @@ class _CompleteServicePageState extends State<CompleteServicePage>
         CircleAvatar(
           radius: 17,
           backgroundColor: active ? Colors.blue : Colors.grey.shade200,
-          child:
-              Icon(icon, size: 18, color: active ? Colors.white : Colors.grey),
+          child: Icon(
+            icon,
+            size: 18,
+            color: active ? Colors.white : Colors.grey,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
@@ -334,8 +373,7 @@ class _OtpBox extends StatelessWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color:
-                hasError ? const Color(0xFFDC2626) : const Color(0xFF1A1A2E),
+            color: hasError ? const Color(0xFFDC2626) : const Color(0xFF1A1A2E),
           ),
           decoration: InputDecoration(
             counterText: '',
@@ -349,8 +387,8 @@ class _OtpBox extends StatelessWidget {
                 color: hasError
                     ? const Color(0xFFDC2626)
                     : controller.text.isNotEmpty
-                        ? Colors.deepOrange
-                        : const Color(0xFFE5E7EB),
+                    ? Colors.deepOrange
+                    : const Color(0xFFE5E7EB),
                 width: 1.5,
               ),
             ),

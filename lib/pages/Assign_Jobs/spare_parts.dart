@@ -1,13 +1,14 @@
 import 'dart:core';
 
+import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/model/spareparts.dart';
 import 'package:field_star_technician_app/pages/payments/completeservice.dart';
 import 'package:field_star_technician_app/service/database_operation.dart';
 import 'package:flutter/material.dart';
 
 class SpareParts extends StatefulWidget {
-    final int complaintId;
-  const SpareParts({super.key, required this.complaintId});
+    final RaiseComplaintModel complaint;
+  const SpareParts({super.key, required this.complaint});
 
   @override
   State<SpareParts> createState() => _SparePartsState();
@@ -39,7 +40,7 @@ bool _isSaving =false;
 
   void _refreshParts() {
     setState(() {
-      _parts = DatabaseOpration().fetchSpareParts(widget.complaintId);
+      _parts = DatabaseOpration().fetchSpareParts(widget.complaint.dbId!);
     });
   }
   @override
@@ -198,7 +199,9 @@ bool _isSaving =false;
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => CompleteServicePage()),
+              MaterialPageRoute(builder: (context) => CompleteServicePage(
+                complaint: widget.complaint,
+              )),
             );
           },
           style: btnStyle(Colors.deepOrange),
@@ -352,7 +355,7 @@ bool _isSaving =false;
                           try {
                             await DatabaseOpration().addSparePart(
                               SparePartModel(
-                                complaintId: widget.complaintId,
+                                complaintId: widget.complaint.dbId,
                                 partNumber: partCtrl.text.trim(),
                                 description: descCtrl.text.trim(),
                                 quantity: int.tryParse(qtyCtrl.text) ?? 1,
