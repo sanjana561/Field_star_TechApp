@@ -143,7 +143,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
       body: ListView(
         padding: const EdgeInsets.all(14),
         children: [
-          // ── Step indicator ──────────────────────────────────────────────
+// ── Step indicator ──────────────────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -157,7 +157,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
 
           const SizedBox(height: 28),
 
-          // ── Info banner ─────────────────────────────────────────────────
+// ── Info banner ─────────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -198,7 +198,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
 
           const SizedBox(height: 28),
 
-          // ── OTP heading ─────────────────────────────────────────────────
+  // ── OTP heading ─────────────────────────────────────────────────
           const Center(
             child: Text(
               'Enter Customer OTP',
@@ -215,7 +215,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
 
           const SizedBox(height: 22),
 
-          // ── OTP boxes ───────────────────────────────────────────────────
+  // ── OTP boxes ───────────────────────────────────────────────────
           AnimatedBuilder(
             animation: _shakeAnimation,
             builder: (context, child) => Transform.translate(
@@ -239,7 +239,7 @@ class _CompleteServicePageState extends State<CompleteServicePage>
             ),
           ),
 
-          // ── Error label ─────────────────────────────────────────────────
+ // ── Error label ─────────────────────────────────────────────────
           const SizedBox(height: 10),
           AnimatedOpacity(
             opacity: _hasError ? 1 : 0,

@@ -39,6 +39,7 @@ class _JobdetailsState extends State<Jobdetails> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+//=======================Fetch complaintID========================================
             FutureBuilder<RaiseComplaintModel?>(
               future: database.fetchComplaintByTicketId(widget.complaint.id),
               builder: (context, snapshot) {
@@ -88,7 +89,7 @@ class _JobdetailsState extends State<Jobdetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Customer Info
+ //===================================Customer Info==============================================
             FutureBuilder<List<CustomerModel>>(
               future: database.fetchcustomer(),
               builder: (context, snapshot) {
@@ -149,7 +150,7 @@ class _JobdetailsState extends State<Jobdetails> {
                 );
               },
             ),
-
+//===========================Call And message button===================================
             const SizedBox(height: 12),
             Row(
               children: [
@@ -176,7 +177,7 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
             const Divider(height: 30),
 
-            // Service Location
+  //=============================== Service Location=================================
             const Row(
               children: [
                 Icon(Icons.location_on, color: Colors.orange),
@@ -187,6 +188,7 @@ class _JobdetailsState extends State<Jobdetails> {
                 ),
               ],
             ),
+//=========================Fetch customer Location================================
             FutureBuilder<List<CustomerModel>>(
               future: database.fetchcustomer(),
               builder: (context, snapshot) {
@@ -224,7 +226,7 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
             const Divider(height: 30),
 
-            // Equipment Info
+ //============================== Equipment Info======================================
             const Text(
               "Equipment Information",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -296,6 +298,7 @@ class _JobdetailsState extends State<Jobdetails> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
+//========================Fetch completed complaint-================================
          FutureBuilder<RaiseComplaintModel?>(
               future: database.Fetchcomplaintdetais(widget.complaint.id),
               builder: (context, snapshot) {
@@ -332,6 +335,7 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
 
             SizedBox(height: 15),
+//====================================Important notice==================================
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -373,6 +377,7 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
 
             const Divider(height: 30),
+//===========================Mark enroute and Start inspection button===================================
             Row(
               children: [
                 Expanded(
@@ -448,7 +453,7 @@ class _JobdetailsState extends State<Jobdetails> {
     );
   }
 
-  //Google Map
+  //========================Google Map=======================================
   Future<void> _launchGoogleMaps() async {
     const String address = "1600 Amphitheatre Pkwy, Mountain View, CA";
 

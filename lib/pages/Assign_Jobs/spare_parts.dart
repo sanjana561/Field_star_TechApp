@@ -19,7 +19,7 @@ class _SparePartsState extends State<SpareParts> {
   final descCtrl = TextEditingController();
   final qtyCtrl = TextEditingController(text: '1');
   final costCtrl = TextEditingController();
-bool _isSaving =false;
+  bool _isSaving =false;
   bool inStock = true;
   bool showAddForm = false;
  late Future<List<SparePartModel>>  _parts;
@@ -62,10 +62,7 @@ bool _isSaving =false;
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              'TCK-2451 • Deep Fryer',
-              style: TextStyle(color: Colors.blueGrey, fontSize: 11),
-            ),
+           
           ],
         ),
       ),
@@ -82,7 +79,7 @@ bool _isSaving =false;
             ],
           ),
           const SizedBox(height: 12),
-
+//==========================List of spare parts added
          FutureBuilder<List<SparePartModel>>(
             future: _parts,
             builder: (context, snapshot) {
@@ -118,6 +115,7 @@ bool _isSaving =false;
           showAddForm ? addPartForm() : addAnotherButton(),
 
           const SizedBox(height: 14),
+//========================Payment List======================================
 
           card(
             child: const Column(
@@ -211,7 +209,7 @@ bool _isSaving =false;
     );
   }
 
-
+//==========================Helper Function======================================
   Widget _partCard(SparePartModel part) {
     return card(
       child: Column(

@@ -22,6 +22,7 @@ class _AssignJobsState extends State<AssignJobs> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+//=======================Good morning Greerting==================================
             Text(
               DatabaseOpration().getGreeting(),
               style: TextStyle(
@@ -44,9 +45,10 @@ class _AssignJobsState extends State<AssignJobs> {
 
       body: Column(
         children: [
+//==============================Get job completed status=================================
           Stack(
             children: [
-              Container(height: 250, color: const Color(0xFF1D2126)),
+              Container(height: 240, color: const Color(0xFF1D2126)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: FutureBuilder<List<dynamic>>(
@@ -90,6 +92,7 @@ class _AssignJobsState extends State<AssignJobs> {
                         ),
 
                         const SizedBox(height: 30),
+//=========================Job completed status card======================================
                         Row(
                           children: [
                             _buildStatCard(
@@ -143,6 +146,7 @@ class _AssignJobsState extends State<AssignJobs> {
               ),
             ),
           ),
+//===========================All job assised based on tech ID===================================
           Expanded(
             child: FutureBuilder<List<RaiseComplaintModel>>(
               future: database.fetchComplaints(),
@@ -176,7 +180,7 @@ class _AssignJobsState extends State<AssignJobs> {
                       default:
                         priorityColor = Colors.green;
                     }
-
+//===========================Job assigned job card design==================================
                     return JobCard(
                       id: complaint.id,
                       title: complaint.title,
@@ -212,7 +216,7 @@ class _AssignJobsState extends State<AssignJobs> {
   ) {
     return Expanded(
       child: Container(
-        height: 110,
+        height: 115,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: const Color(0xFF2C333A), // Card color

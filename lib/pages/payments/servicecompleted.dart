@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
+import 'package:field_star_technician_app/service/database_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ServiceCompletedPage extends StatefulWidget {
-  const ServiceCompletedPage({super.key});
+    final RaiseComplaintModel complaint;
+  const ServiceCompletedPage({super.key, required this.complaint});
 
   @override
   State<ServiceCompletedPage> createState() => _ServiceCompletedPageState();
@@ -11,7 +14,7 @@ class ServiceCompletedPage extends StatefulWidget {
 
 class _ServiceCompletedPageState extends State<ServiceCompletedPage> {
   late final Timer _timer;
-
+final database=DatabaseOpration();
   @override
   void initState() {
     super.initState();
@@ -62,15 +65,44 @@ class _ServiceCompletedPageState extends State<ServiceCompletedPage> {
               ),
 
               const SizedBox(height: 12),
+               FutureBuilder<RaiseComplaintModel?>(
+              future: database.fetchComplaintByTicketId(widget.complaint.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              const Text(
-                'Job TCK-2451 has been successfully closed',
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text('No complaints found'),
+                    ),
+                  );
+                }
+
+                final complaint = snapshot.data!;
+
+              return  Text(
+                '${complaint.id} has been successfully closed',
+                
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.blueGrey,
                 ),
-              ),
+              );
+              }
+               ),
 
               const SizedBox(height: 18),
 

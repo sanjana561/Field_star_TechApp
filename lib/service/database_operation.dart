@@ -95,11 +95,10 @@ class DatabaseOpration {
       return AssignedjobModel.fromMap(response);
   }
 
-  Future<Map<String, int>> getTechStats() async {
+ Future<Map<String, int>> getTechStats() async {
   final user = supabase.auth.currentUser;
   if (user == null) return {};
 
- 
   final techResponse = await supabase
       .from('technician')
       .select('id')
@@ -108,16 +107,25 @@ class DatabaseOpration {
 
   if (techResponse == null) return {};
   final technicianId = techResponse['id'];
+
   final response = await supabase
       .from('Raise_complaint')
-      .select('complaint_status,tech_status')
+      .select('complaint_status,tech_status,Date')
       .eq('technician_id', technicianId);
 
   final complaints = response as List;
+  final now = DateTime.now();
+  final todayStart = DateTime(now.year, now.month, now.day);
+  final todayEnd = todayStart.add(const Duration(days: 1));
 
-  // Count stats
-  final today = DateTime.now();
-  int jobsToday = complaints.length;
+  int jobsToday = complaints.where((c) {
+    final raw = c['Date'];
+    if (raw == null) return false;
+    final date = DateTime.tryParse(raw.toString());
+    if (date == null) return false;
+    return date.isAfter(todayStart) && date.isBefore(todayEnd);
+  }).length;
+
   int completed = complaints
       .where((c) => c['complaint_status'] == 'Completed').length;
   int inProgress = complaints

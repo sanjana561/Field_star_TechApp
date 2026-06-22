@@ -56,6 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     _passwordController.dispose();
     super.dispose();
   }
+  
  void _showSnack(String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(

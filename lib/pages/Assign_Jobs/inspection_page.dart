@@ -21,6 +21,7 @@ class _InspectionPageState extends State<InspectionPage> {
   final List<String> _uploadedPhotoUrls = [];
   final List<XFile> _selectedImages = [];
   bool _isUploading = false;
+//=====================List of CheckList=============================
   final List<String> checklist = [
     "Visual inspection of exterior condition",
     "Check electrical connections and wiring",
@@ -39,8 +40,7 @@ class _InspectionPageState extends State<InspectionPage> {
 
   int get completedCount => _checks.where((c) => c).length;
 
-  bool get isValid =>
-      completedCount == checklist.length && _diagCtrl.text.trim().isNotEmpty;
+  bool get isValid =>completedCount == checklist.length && _diagCtrl.text.trim().isNotEmpty;
 
   @override
   void dispose() {
@@ -331,7 +331,7 @@ class _InspectionPageState extends State<InspectionPage> {
 
                         const SizedBox(height: 10),
 
-                        // Upload button
+ //============================================Upload button============================================
                         GestureDetector(
                           onTap: _isUploading ? null : _pickAndUploadImage,
                           child: Container(
@@ -389,7 +389,7 @@ class _InspectionPageState extends State<InspectionPage> {
                   ),
 
                   const SizedBox(height: 22),
-                  //===========================Diagnosis & Findings text area====================================
+//===========================Diagnosis & Findings text area====================================
                   const Text(
                     "Diagnosis & Findings",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -401,7 +401,7 @@ class _InspectionPageState extends State<InspectionPage> {
                   ),
 
                   const SizedBox(height: 22),
-                  //========================Additional textarea=====================================
+ //========================Additional textarea=====================================
                   const Text(
                     "Additional Notes",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -418,7 +418,7 @@ class _InspectionPageState extends State<InspectionPage> {
               ),
             ),
           ),
-          //=================================Continue Spareparts buttom===============================
+//=================================Continue Spareparts buttom===============================
           Container(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
             decoration: BoxDecoration(
@@ -476,7 +476,7 @@ class _InspectionPageState extends State<InspectionPage> {
     );
   }
 
-  //=======================TextArea design styling=======================================
+ //=======================TextArea design styling=======================================
   Widget _textArea({
     required TextEditingController controller,
     required String hint,
@@ -507,7 +507,7 @@ class _InspectionPageState extends State<InspectionPage> {
     );
   }
 
-  //===============================Pick image================================
+ //===============================Pick image================================
   Future<void> _pickAndUploadImage() async {
     // Request permission first
     final status = await Permission.photos.request();

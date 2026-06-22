@@ -69,7 +69,9 @@ class _SignaturePageState extends State<SignaturePage> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => PaymentPage()),
+        MaterialPageRoute(builder: (context) => PaymentPage(
+          complaint: widget.complaint,
+        )),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,8 +1,10 @@
+import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/pages/payments/servicecompleted.dart';
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
+    final RaiseComplaintModel complaint;
+  const PaymentPage({super.key, required this.complaint});
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
@@ -145,7 +147,9 @@ class _PaymentPageState extends State<PaymentPage> {
             height: 42,
             child: ElevatedButton(
               onPressed: selectedPaymentMethod == null ? null : () {
-                Navigator.push(context,MaterialPageRoute(builder: (context)=>ServiceCompletedPage()));
+                Navigator.push(context,MaterialPageRoute(builder: (context)=>ServiceCompletedPage(
+                  complaint: widget.complaint,
+                )));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepOrange,

@@ -187,8 +187,7 @@ void _showSnack(String message) {
           _buildLabel('Password'),
           const SizedBox(height: 8),
           _buildPasswordField(),
-          const SizedBox(height: 8),
-          _buildForgotPassword(),
+         
           const SizedBox(height: 8),
           _buildSignUpRow(),
           const SizedBox(height: 28),
@@ -275,29 +274,7 @@ void _showSnack(String message) {
       ),
     );
   }
- 
-  Widget _buildForgotPassword() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: () {},
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: const Text(
-          'Forgot password?',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.deepOrange,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
- 
+
   Widget _buildSignUpRow() {
     return Row(
       children: [
