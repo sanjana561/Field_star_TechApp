@@ -58,27 +58,39 @@ class DatabaseOpration {
   }
 
   //========================Fetch Customer============================
- Future<List<CustomerModel>> fetchcustomer() async {
-  try {
-    final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('User not logged in');
+ Future<CustomerModel?> fetchCustomerByTicketId(String ticketId) async {
+  // Step 1: get customer_id from Raise_complaint
+  final complaintResponse = await Supabase.instance.client
+      .from('Raise_complaint')
+      .select('customer_id')
+      .eq('tickectid', ticketId)
+      .maybeSingle();
 
-    final customers = await supabase
-        .from('customer')
-        .select('*, Raise_complaint(id)')
-        .eq('id', user.id)         
-        .order('created_at', ascending: false);
+  if (complaintResponse == null) return null;
 
-    return (customers as List).map((json) {
-      final complaints = json['Raise_complaint'] as List? ?? [];
-      final enriched = Map<String, dynamic>.from(json);
-      enriched['complaint_count'] = complaints.length;
-      return CustomerModel.fromMap(enriched);
-    }).toList();
-  } catch (e) {
-    print('fetchcustomer error: $e');
-    rethrow;
-  }
+  final customerId = complaintResponse['customer_id']?.toString();
+  if (customerId == null) return null;
+
+  // Step 2: fetch customer using that customer_id
+  final customerResponse = await Supabase.instance.client
+      .from('customer')
+      .select('id, cust_name, cust_phno, cust_location, cust_place, cust_hotelname, total_equipment, revenue_ytd, Raise_complaint(id, tickectid)')
+      .eq('id', customerId)
+      .maybeSingle();
+
+  if (customerResponse == null) return null;
+
+  final complaints = customerResponse['Raise_complaint'] as List? ?? [];
+  final ticketIds = complaints
+      .map((c) => c['tickectid']?.toString() ?? '')
+      .where((t) => t.isNotEmpty)
+      .toList();
+
+  return CustomerModel.fromMap({
+    ...customerResponse,
+    'complaint_count': complaints.length,
+    'ticket_ids': ticketIds,
+  });
 }
   //=========================Getname and techID===============================
   Future<AssignedjobModel?> gettechprofile()async{

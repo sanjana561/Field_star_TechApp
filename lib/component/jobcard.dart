@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class JobCard extends StatelessWidget {
-  final String id, title, type, issue, location, distance, eta, priority;
+  final String id, title, type, issue, location, distance, priority;
   final Color priorityColor;
   final VoidCallback onTap;
 
@@ -13,7 +13,7 @@ class JobCard extends StatelessWidget {
     required this.issue,
     required this.location,
     required this.distance,
-    required this.eta,
+   
     required this.priority,
     required this.priorityColor,
     required this.onTap, // 2. Add to constructor
@@ -100,20 +100,8 @@ class JobCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(distance, style: const TextStyle(color: Colors.grey)),
-                  Text(
-                    "ETA: $eta",
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+              
+              
               const Divider(height: 24),
               const Text(
                 "View Details →",

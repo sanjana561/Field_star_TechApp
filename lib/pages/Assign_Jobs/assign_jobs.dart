@@ -188,7 +188,7 @@ class _AssignJobsState extends State<AssignJobs> {
                       issue: complaint.issue,
                       location: complaint.location,
                       distance: complaint.technician?.location ?? 'N/A',
-                      eta: 'N/A', 
+                     
                       priority: complaint.priority,
                       priorityColor: priorityColor,
                       onTap: () {

@@ -90,66 +90,36 @@ class _JobdetailsState extends State<Jobdetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
  //===================================Customer Info==============================================
-            FutureBuilder<List<CustomerModel>>(
-              future: database.fetchcustomer(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+          FutureBuilder<CustomerModel?>(
+  future: database.fetchCustomerByTicketId(widget.complaint.id),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
+    if (!snapshot.hasData || snapshot.data == null) {
+      return const Center(child: Text('No customer found.'));
+    }
 
-                final customers = snapshot.data ?? [];
+    final customer = snapshot.data!;
 
-                if (customers.isEmpty) {
-                  return const Center(child: Text('No customers found.'));
-                }
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: customers.length,
-                  itemBuilder: (context, index) {
-                    final customer = customers[index];
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          customer.hotelName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        Text(
-                          "Contact: ${customer.customerName}\nPhone: ${customer.phone}",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-
-                        Text(
-                          "Location: ${customer.location}, ${customer.place}",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-
-                        Text(
-                          "Total Equipment: ${customer.totalEquipment}",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-
-                        Text(
-                          "Complaints: ${customer.complaintCount}",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(customer.hotelName,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text('Contact: ${customer.customerName}\nPhone: ${customer.phone}',
+            style: const TextStyle(color: Colors.grey)),
+        Text('Location: ${customer.location}, ${customer.place}',
+            style: const TextStyle(color: Colors.grey)),
+        Text('Total Equipment: ${customer.totalEquipment}',
+            style: const TextStyle(color: Colors.grey)),
+        Text('Complaints: ${customer.complaintCount}',
+            style: const TextStyle(color: Colors.grey)),
+      ],
+    );
+  },
+),
 //===========================Call And message button===================================
             const SizedBox(height: 12),
             Row(
@@ -189,24 +159,19 @@ class _JobdetailsState extends State<Jobdetails> {
               ],
             ),
 //=========================Fetch customer Location================================
-            FutureBuilder<List<CustomerModel>>(
-              future: database.fetchcustomer(),
+            FutureBuilder<CustomerModel?>(
+              future: database.fetchCustomerByTicketId(widget.complaint.id),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+               if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
+    if (!snapshot.hasData || snapshot.data == null) {
+      return const Center(child: Text('No customer found.'));
+    }
 
-                final customers = snapshot.data ?? [];
+    final customer = snapshot.data!;
 
-                if (customers.isEmpty) {
-                  return const Center(child: Text('No customers found.'));
-                }
-
-                final customer = customers.first;
                 return Text(
                   "Location: ${customer.location}, ${customer.place}",
                   style: const TextStyle(color: Colors.grey),
@@ -380,27 +345,7 @@ class _JobdetailsState extends State<Jobdetails> {
 //===========================Mark enroute and Start inspection button===================================
             Row(
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Colors.grey,
-                      ), // Light grey outline
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      "Mark En Route",
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+               
                 const SizedBox(width: 12),
 
                 Expanded(
