@@ -21,6 +21,7 @@ class _AssignJobsState extends State<AssignJobs> {
         backgroundColor: const Color(0xFF1D2126),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          
           children: [
 //=======================Good morning Greerting==================================
             Text(
@@ -37,7 +38,10 @@ class _AssignJobsState extends State<AssignJobs> {
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.white.withOpacity(0.08),
               ),
-              child: const Icon(Icons.settings, color: Colors.white),
+              child:IconButton(onPressed: (){
+                context.go('/Profile');
+
+              }, icon: Icon(Icons.account_circle_outlined,color: Colors.white,size: 30,)),
             ),
           ],
         ),
@@ -87,7 +91,7 @@ class _AssignJobsState extends State<AssignJobs> {
 
                        
                         Text(
-                          '${tech?.techId ?? ''} • Senior Technician',
+                          'Technician ID : ${tech?.techId ?? ''} ',
                           style: const TextStyle(color: Colors.white70),
                         ),
 
@@ -188,7 +192,7 @@ class _AssignJobsState extends State<AssignJobs> {
                       issue: complaint.issue,
                       location: complaint.location,
                       distance: complaint.technician?.location ?? 'N/A',
-                     
+                      status: complaint.status,                    
                       priority: complaint.priority,
                       priorityColor: priorityColor,
                       onTap: () {

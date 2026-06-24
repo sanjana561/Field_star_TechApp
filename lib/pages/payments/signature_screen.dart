@@ -54,7 +54,7 @@ class _SignaturePageState extends State<SignaturePage> {
       final fileName = 'signature_${widget.complaint.dbId}_${DateTime.now().millisecondsSinceEpoch}.png';
 
       await Supabase.instance.client.storage
-          .from('signatures')               // ← your bucket name
+          .from('signatures')              
           .uploadBinary(fileName, signatureBytes);
 
       final signatureUrl = Supabase.instance.client.storage

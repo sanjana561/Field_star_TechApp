@@ -3,6 +3,7 @@ import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/navbar/shell.dart';
 import 'package:field_star_technician_app/pages/Assign_Jobs/assign_jobs.dart';
 import 'package:field_star_technician_app/pages/JobDetails/jobdetails.dart';
+import 'package:field_star_technician_app/pages/Profile/profile_screen.dart';
 import 'package:field_star_technician_app/pages/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -73,10 +74,10 @@ final GoRouter appRouter = GoRouter(
         //   path: '/Bookings',
         //   builder: (_, _) => const Booking(),
         // ),
-        // GoRoute(
-        //   path: '/Profile',
-        //   builder: (_, _) => const ProfileScreen(),
-        // ),
+        GoRoute(
+          path: '/Profile',
+          builder: (_, _) => const ProfileScreen(),
+        ),
       ],
     ),
 

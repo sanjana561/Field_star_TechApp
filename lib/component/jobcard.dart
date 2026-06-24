@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class JobCard extends StatelessWidget {
-  final String id, title, type, issue, location, distance, priority;
+  final String id, title, type, issue, location, distance, priority, status;
   final Color priorityColor;
   final VoidCallback onTap;
 
@@ -13,7 +13,7 @@ class JobCard extends StatelessWidget {
     required this.issue,
     required this.location,
     required this.distance,
-   
+    required this.status,
     required this.priority,
     required this.priorityColor,
     required this.onTap, // 2. Add to constructor
@@ -23,15 +23,14 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      clipBehavior: Clip
-          .hardEdge,
+      clipBehavior: Clip.hardEdge,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.blue.shade100, width: 1.5),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
-        onTap: onTap, 
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -100,15 +99,37 @@ class JobCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
-              
+
               const Divider(height: 24),
-              const Text(
-                "View Details →",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "View Details →",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: priorityColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: priorityColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

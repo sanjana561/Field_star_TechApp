@@ -4,20 +4,25 @@ import 'package:field_star_technician_app/model/raiseComplaint_model.dart';
 import 'package:field_star_technician_app/pages/Assign_Jobs/inspection_page.dart';
 import 'package:field_star_technician_app/service/database_operation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Jobdetails extends StatefulWidget {
   final RaiseComplaintModel complaint;
-  
+
   final String customerid;
-  const Jobdetails({super.key, required this.complaint, required this.customerid});
+  const Jobdetails({
+    super.key,
+    required this.complaint,
+    required this.customerid,
+  });
 
   @override
   State<Jobdetails> createState() => _JobdetailsState();
 }
 
 class _JobdetailsState extends State<Jobdetails> {
-   AssignedjobModel? _techDetails;
+  AssignedjobModel? _techDetails;
   final database = DatabaseOpration();
   @override
   Widget build(BuildContext context) {
@@ -29,17 +34,13 @@ class _JobdetailsState extends State<Jobdetails> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              print('No previous route to pop');
-            }
+            context.push('/Home');
           },
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-//=======================Fetch complaintID========================================
+            //=======================Fetch complaintID========================================
             FutureBuilder<RaiseComplaintModel?>(
               future: database.fetchComplaintByTicketId(widget.complaint.id),
               builder: (context, snapshot) {
@@ -89,45 +90,58 @@ class _JobdetailsState extends State<Jobdetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
- //===================================Customer Info==============================================
-          FutureBuilder<CustomerModel?>(
-  future: database.fetchCustomerByTicketId(widget.complaint.id),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
+            //===================================Customer Info==============================================
+            FutureBuilder<CustomerModel?>(
+              future: database.fetchCustomerByTicketId(widget.complaint.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-    if (!snapshot.hasData || snapshot.data == null) {
-      return const Center(child: Text('No customer found.'));
-    }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(child: Text('No customer found.'));
+                }
 
-    final customer = snapshot.data!;
+                final customer = snapshot.data!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(customer.hotelName,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text('Contact: ${customer.customerName}\nPhone: ${customer.phone}',
-            style: const TextStyle(color: Colors.grey)),
-        Text('Location: ${customer.location}, ${customer.place}',
-            style: const TextStyle(color: Colors.grey)),
-        Text('Total Equipment: ${customer.totalEquipment}',
-            style: const TextStyle(color: Colors.grey)),
-        Text('Complaints: ${customer.complaintCount}',
-            style: const TextStyle(color: Colors.grey)),
-      ],
-    );
-  },
-),
-//===========================Call And message button===================================
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      customer.hotelName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Contact: ${customer.customerName}\nPhone: ${customer.phone}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      'Location: ${customer.location}, ${customer.place}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      'Total Equipment: ${customer.totalEquipment}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    Text(
+                      'Complaints: ${customer.complaintCount}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                );
+              },
+            ),
+            //===========================Call And message button===================================
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                        _makeCall(_techDetails?.phoneNo ?? '-');
+                      _makeCall(_techDetails?.phoneNo ?? '-');
                     },
                     icon: const Icon(Icons.call),
                     label: const Text("Call Customer"),
@@ -137,7 +151,7 @@ class _JobdetailsState extends State<Jobdetails> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                       _sendSms(_techDetails?.phoneNo ?? '-');
+                      _sendSms(_techDetails?.phoneNo ?? '-');
                     },
                     icon: const Icon(Icons.message),
                     label: const Text("SMS"),
@@ -147,7 +161,7 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
             const Divider(height: 30),
 
-  //=============================== Service Location=================================
+            //=============================== Service Location=================================
             const Row(
               children: [
                 Icon(Icons.location_on, color: Colors.orange),
@@ -158,19 +172,19 @@ class _JobdetailsState extends State<Jobdetails> {
                 ),
               ],
             ),
-//=========================Fetch customer Location================================
+            //=========================Fetch customer Location================================
             FutureBuilder<CustomerModel?>(
               future: database.fetchCustomerByTicketId(widget.complaint.id),
               builder: (context, snapshot) {
-               if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-    if (!snapshot.hasData || snapshot.data == null) {
-      return const Center(child: Text('No customer found.'));
-    }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(child: Text('No customer found.'));
+                }
 
-    final customer = snapshot.data!;
+                final customer = snapshot.data!;
 
                 return Text(
                   "Location: ${customer.location}, ${customer.place}",
@@ -186,12 +200,12 @@ class _JobdetailsState extends State<Jobdetails> {
                   _launchGoogleMaps();
                 },
                 icon: const Icon(Icons.navigation),
-                label: const Text("Get Directions (2.3 km)"),
+                label: const Text("Get Directions"),
               ),
             ),
             const Divider(height: 30),
 
- //============================== Equipment Info======================================
+            //============================== Equipment Info======================================
             const Text(
               "Equipment Information",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -257,14 +271,14 @@ class _JobdetailsState extends State<Jobdetails> {
 
             const Divider(height: 30),
 
-            // Service History
+            //=========================== Service History=================================
             const Text(
               "Previous Service History",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 10),
-//========================Fetch completed complaint-================================
-         FutureBuilder<RaiseComplaintModel?>(
+            //========================Fetch completed complaint-================================
+            FutureBuilder<RaiseComplaintModel?>(
               future: database.Fetchcomplaintdetais(widget.complaint.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -300,7 +314,34 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
 
             SizedBox(height: 15),
-//====================================Important notice==================================
+            const Divider(height: 30),
+
+            //=========================== Service History=================================
+            const Text(
+              "Complaint images",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            FutureBuilder<List<String>>(
+              future: database.fetchImages(widget.complaint.id.toString()),
+              builder: (context, snapshot) {
+                final urls = snapshot.data ?? [];
+                if (urls.isEmpty) return const Text('No image');
+
+                return Image.network(
+                  urls.first,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.broken_image_outlined,
+                    color: Color(0xFF94A3B8),
+                  ),
+                );
+              },
+            ),
+
+            SizedBox(height: 15),
+
+            //====================================Important notice==================================
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -342,10 +383,9 @@ class _JobdetailsState extends State<Jobdetails> {
             ),
 
             const Divider(height: 30),
-//===========================Mark enroute and Start inspection button===================================
+            //===========================Mark enroute and Start inspection button===================================
             Row(
               children: [
-               
                 const SizedBox(width: 12),
 
                 Expanded(
@@ -354,9 +394,8 @@ class _JobdetailsState extends State<Jobdetails> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => InspectionPage(
-                            complaint: widget.complaint,
-                          ),
+                          builder: (context) =>
+                              InspectionPage(complaint: widget.complaint),
                         ),
                       );
                     },
@@ -416,7 +455,6 @@ class _JobdetailsState extends State<Jobdetails> {
     }
   }
 
-  
   //==============================Make a call======================================
   Future<void> _makeCall(String phone) async {
     final Uri uri = Uri(scheme: 'tel', path: phone);
