@@ -432,4 +432,25 @@ Future<Map<String, dynamic>> getgrapcount() async {
 
   return AssignedjobModel.fromMap(response);
 }
+
+//=====================fetch category count====================
+Future<List<Map<String, dynamic>>> fetchCategoryJobCounts() async {
+  final response = await Supabase.instance.client
+      .from('Raise_complaint')
+      .select('Category_name');
+
+  final Map<String, int> counts = {};
+
+  for (final row in response) {
+    final category = row['Category_name'] ?? 'Unknown';
+    counts[category] = (counts[category] ?? 0) + 1;
+  }
+
+  return counts.entries.map((e) {
+    return {
+      'category': e.key,
+      'count': e.value,
+    };
+  }).toList();
+}
 }
