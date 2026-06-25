@@ -435,22 +435,79 @@ Future<Map<String, dynamic>> getgrapcount() async {
 
 //=====================fetch category count====================
 Future<List<Map<String, dynamic>>> fetchCategoryJobCounts() async {
+  final user = Supabase.instance.client.auth.currentUser;
+
+  if (user == null) {
+    throw Exception('User not logged in');
+  }
+
+  // Get technician record
+  final tech = await Supabase.instance.client
+      .from('technician')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+  if (tech == null) {
+    throw Exception('No technician profile found for this account');
+  }
+
+  final technicianId = tech['id'];
+
+  // Fetch complaints assigned to this technician
   final response = await Supabase.instance.client
       .from('Raise_complaint')
-      .select('Category_name');
+      .select('Category_name')
+      .eq('technician_id', technicianId);
 
   final Map<String, int> counts = {};
 
   for (final row in response) {
-    final category = row['Category_name'] ?? 'Unknown';
+    final category = (row['Category_name'] ?? 'Unknown').toString();
+
     counts[category] = (counts[category] ?? 0) + 1;
   }
 
-  return counts.entries.map((e) {
-    return {
-      'category': e.key,
-      'count': e.value,
-    };
-  }).toList();
+  return counts.entries
+      .map(
+        (e) => {
+          'category': e.key,
+          'count': e.value,
+        },
+      )
+      .toList();
 }
+
+ Future<void> registerTechnicianWithAuth({
+    required String fullName,
+    required String techId,
+    required String phone,
+    required String location,
+    required String specialization,
+    required String email,
+    required String password,
+  }) async {
+ 
+    final authResponse = await supabase.auth.signUp(
+      email: email,
+      password: password,
+      data: {'full_name': fullName, 'role': 'technician'},
+    );
+
+    if (authResponse.user == null) {
+      throw Exception('Failed to create auth user');
+    }
+
+    final userId = authResponse.user!.id;
+   
+    await supabase.from('technician').insert({
+      'Full_name': fullName,
+      'TechID': techId,
+      'Phone_no': phone,
+      'Location': location,
+      'Specialization': specialization,
+      'user_id': userId, 
+    });
+
+  }
 }

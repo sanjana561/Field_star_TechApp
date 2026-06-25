@@ -1,33 +1,39 @@
+import 'package:field_star_technician_app/service/database_operation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
- 
+
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
- 
+
 class _SignUpScreenState extends State<SignUpScreen>
     with SingleTickerProviderStateMixin {
+  final database = DatabaseOpration();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _techIdController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _specializationController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
- 
+
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
- 
-  // Brand colors — light mode palette
-  static const _cardBg     = Color(0xFFFFFFFF);
-  static const _textDark   = Color(0xFF1A2332);
-  static const _textMuted  = Color(0xFF8A97A8);
-  static const _inputBg    = Color(0xFFF5F8FA);
-  static const _border     = Color(0xFFE2E8EF);
 
- 
+  // Brand colors — light mode palette
+  static const _cardBg = Color(0xFFFFFFFF);
+  static const _textDark = Color(0xFF1A2332);
+  static const _textMuted = Color(0xFF8A97A8);
+  static const _inputBg = Color(0xFFF5F8FA);
+  static const _border = Color(0xFFE2E8EF);
+
   @override
   void initState() {
     super.initState();
@@ -35,20 +41,14 @@ class _SignUpScreenState extends State<SignUpScreen>
       vsync: this,
       duration: const Duration(milliseconds: 750),
     );
-    _fadeAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOut,
-    );
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.10),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOutCubic,
-    ));
+    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
+    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.10), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+        );
     _animController.forward();
   }
- 
+
   @override
   void dispose() {
     _animController.dispose();
@@ -56,55 +56,56 @@ class _SignUpScreenState extends State<SignUpScreen>
     _passwordController.dispose();
     super.dispose();
   }
-  
- void _showSnack(String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      backgroundColor: const Color(0xFF1A2332),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    ),
-  );
-}
-void _handleSignUp() async {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
 
-  if (email.isEmpty || password.isEmpty) {
-    _showSnack('Please fill in all fields');
-    return;
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFF1A2332),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
-  if (password.length < 6) {
-    _showSnack('Password must be at least 6 characters');
-    return;
-  }
+  void _handleSignUp() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
-  setState(() => _isLoading = true);
-
-  try {
-   final response = await Supabase.instance.client.auth.signUp(
-  email: email,
-  password: password,
-);
-
-if (response.user != null) {
-  context.go('/Home');
-} else {
-      _showSnack('Signup failed. Please try again.');
+    if (email.isEmpty || password.isEmpty) {
+      _showSnack('Please fill in all fields');
+      return;
     }
-  } on AuthException catch (e) {
-    _showSnack('Auth error: ${e.message}');
-    debugPrint('AuthException: ${e.message} | code: ${e.statusCode}');
-  } catch (e, stack) {
-    _showSnack('Error: ${e.toString()}');
-    debugPrint('Signup error: $e');
-    debugPrint('$stack');
-  } finally {
-    setState(() => _isLoading = false);
+
+    if (password.length < 6) {
+      _showSnack('Password must be at least 6 characters');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await database.registerTechnicianWithAuth(
+        fullName: _nameController.text.trim(),
+        techId: _techIdController.text.trim(),
+        phone: _phoneController.text.trim(),
+        location: _locationController.text.trim(),
+        specialization: _specializationController.text.trim(),
+        email: email,
+        password: password,
+      );
+
+      _showSnack('Technician registered successfully');
+      context.go('/Home');
+    } on AuthException catch (e) {
+      _showSnack(e.message);
+    } catch (e) {
+      _showSnack(e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,10 +143,7 @@ if (response.user != null) {
                   ),
                 ),
                 const SizedBox(height: 28),
-                FadeTransition(
-                  opacity: _fadeAnim,
-                  child: _buildSignInRow(),
-                ),
+                FadeTransition(opacity: _fadeAnim, child: _buildSignInRow()),
                 const SizedBox(height: 32),
               ],
             ),
@@ -154,7 +152,7 @@ if (response.user != null) {
       ),
     );
   }
- 
+
   Widget _buildLogo() {
     return Column(
       children: [
@@ -179,8 +177,11 @@ if (response.user != null) {
                   ),
                 ],
               ),
-              child: const Icon(Icons.engineering_rounded,
-                  color: Colors.white, size: 28),
+              child: const Icon(
+                Icons.engineering_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
             ),
 
             const SizedBox(width: 12),
@@ -207,7 +208,7 @@ if (response.user != null) {
       ],
     );
   }
- 
+
   Widget _buildCard() {
     return Container(
       padding: const EdgeInsets.all(26),
@@ -237,13 +238,57 @@ if (response.user != null) {
           _buildLabel('Password'),
           const SizedBox(height: 8),
           _buildPasswordField(),
+          _buildLabel('Full Name'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            _nameController,
+            'Enter full name',
+            Icons.person_outline,
+          ),
+          const SizedBox(height: 16),
+
+          _buildLabel('Technician ID'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            _techIdController,
+            'Enter technician ID',
+            Icons.badge_outlined,
+          ),
+          const SizedBox(height: 16),
+
+          _buildLabel('Phone'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            _phoneController,
+            'Enter phone number',
+            Icons.phone_outlined,
+          ),
+          const SizedBox(height: 16),
+
+          _buildLabel('Location'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            _locationController,
+            'Enter location',
+            Icons.location_on_outlined,
+          ),
+          const SizedBox(height: 16),
+
+          _buildLabel('Specialization'),
+          const SizedBox(height: 8),
+          _buildTextField(
+            _specializationController,
+            'Enter specialization',
+            Icons.build_outlined,
+          ),
+          const SizedBox(height: 20),
           const SizedBox(height: 28),
           _buildSignUpButton(),
         ],
       ),
     );
   }
- 
+
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -255,7 +300,7 @@ if (response.user != null) {
       ),
     );
   }
- 
+
   Widget _buildEmailField() {
     return Container(
       decoration: BoxDecoration(
@@ -266,23 +311,22 @@ if (response.user != null) {
       child: TextField(
         controller: _emailController,
         keyboardType: TextInputType.emailAddress,
-        style: const TextStyle(
-          fontSize: 15,
-          color: _textDark,
-        ),
+        style: const TextStyle(fontSize: 15, color: _textDark),
         decoration: const InputDecoration(
           hintText: 'your@email.com',
           hintStyle: TextStyle(color: _textMuted, fontSize: 15),
-          prefixIcon: Icon(Icons.mail_outline_rounded,
-              color: _textMuted, size: 20),
+          prefixIcon: Icon(
+            Icons.mail_outline_rounded,
+            color: _textMuted,
+            size: 20,
+          ),
           border: InputBorder.none,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
     );
   }
- 
+
   Widget _buildPasswordField() {
     return Container(
       decoration: BoxDecoration(
@@ -293,18 +337,17 @@ if (response.user != null) {
       child: TextField(
         controller: _passwordController,
         obscureText: _obscurePassword,
-        style: const TextStyle(
-          fontSize: 15,
-          color: _textDark,
-        ),
+        style: const TextStyle(fontSize: 15, color: _textDark),
         decoration: InputDecoration(
           hintText: 'Enter your password',
           hintStyle: const TextStyle(color: _textMuted, fontSize: 15),
-          prefixIcon: const Icon(Icons.lock_outline_rounded,
-              color: _textMuted, size: 20),
+          prefixIcon: const Icon(
+            Icons.lock_outline_rounded,
+            color: _textMuted,
+            size: 20,
+          ),
           suffixIcon: GestureDetector(
-            onTap: () =>
-                setState(() => _obscurePassword = !_obscurePassword),
+            onTap: () => setState(() => _obscurePassword = !_obscurePassword),
             child: Icon(
               _obscurePassword
                   ? Icons.visibility_off_outlined
@@ -314,13 +357,15 @@ if (response.user != null) {
             ),
           ),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
       ),
     );
   }
- 
+
   Widget _buildSignUpButton() {
     return SizedBox(
       width: double.infinity,
@@ -358,28 +403,54 @@ if (response.user != null) {
                     ),
                   ),
                   SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded,
-                      size: 18, color: Colors.black87),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: Colors.black87,
+                  ),
                 ],
               ),
       ),
     );
   }
- 
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _inputBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border, width: 1.2),
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hint,
+          prefixIcon: Icon(icon, color: _textMuted, size: 20),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSignInRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
           'Already have an account? ',
-          style: TextStyle(
-            fontSize: 14,
-            color: _textMuted,
-          ),
+          style: TextStyle(fontSize: 14, color: _textMuted),
         ),
         GestureDetector(
           onTap: () {
-          context.go('/login');
+            context.go('/login');
           },
           child: const Text(
             'Sign In',
@@ -393,4 +464,4 @@ if (response.user != null) {
       ],
     );
   }
-    }
+}

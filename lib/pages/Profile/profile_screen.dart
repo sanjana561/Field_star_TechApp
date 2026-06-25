@@ -196,10 +196,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
                 final categories = snapshot.data ?? [];
 
                 if (categories.isEmpty) {
-                  return const Text("No category jobs found");
+                  return const Center(child: Text('No category jobs found'));
                 }
 
                 return _buildEquipmentSpecializations(categories);
